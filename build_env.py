@@ -62,8 +62,12 @@ def get_env_path(
     # Import prefixes start with the workspace name, which might be the local workspace.
     # We first normalize the given path so that it starts with its workspace name.
     if path.parts[0] == "..":
-        wspath = path.relative_to("..")
-        is_external = True
+        if len(path.parts) >= 4 and path.parts[2].endswith("-link"):
+            wspath = path.relative_to("/".join(path.parts[:3]))
+            return EnvFile(path, wspath)
+        else:
+            wspath = path.relative_to("..")
+            is_external = True
     else:
         wspath = pathlib.Path(workspace) / path
         is_external = False
